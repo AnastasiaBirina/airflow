@@ -4,8 +4,13 @@ import pendulum
 from airflow.decorators import dag, task
 from airflow.models.variable import Variable
 from examples.stg.order_system_restaurants_dag.pg_saver import PgSaver
+from examples.stg.order_system_restaurants_dag.pg_saver_user import PgSaverUser
 from examples.stg.order_system_restaurants_dag.restaurant_loader import RestaurantLoader
 from examples.stg.order_system_restaurants_dag.restaurant_reader import RestaurantReader
+
+from examples.stg.order_system_restaurants_dag.user_loader import UserLoader
+from examples.stg.order_system_restaurants_dag.user_reader import UserReader
+
 from lib import ConnectionBuilder, MongoConnect
 
 log = logging.getLogger(__name__)
@@ -47,10 +52,28 @@ def sprint5_example_stg_order_system_restaurants():
         # Запускаем копирование данных.
         loader.run_copy()
 
+    @task()
+    def load_users():
+        # Инициализируем класс, в котором реализована логика сохранения.
+        pg_saver = PgSaverUser()
+
+        # Инициализируем подключение у MongoDB.
+        mongo_connect = MongoConnect(cert_path, db_user, db_pw, host, rs, db, db)
+
+        # Инициализируем класс, реализующий чтение данных из источника.
+        collection_reader = UserReader(mongo_connect)
+
+        # Инициализируем класс, в котором реализована бизнес-логика загрузки данных.
+        loader = UserLoader(collection_reader, dwh_pg_connect, pg_saver, log)
+
+        # Запускаем копирование данных.
+        loader.run_copy()
+
     restaurant_loader = load_restaurants()
+    user_loader = load_users()
 
     # Задаем порядок выполнения. Таск только один, поэтому зависимостей нет.
-    restaurant_loader  # type: ignore
+    restaurant_loader >> user_loader # type: ignore
 
 
 order_stg_dag = sprint5_example_stg_order_system_restaurants()  # noqa

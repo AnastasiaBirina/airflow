@@ -3,7 +3,9 @@ import logging
 import pendulum
 from airflow.decorators import dag, task
 from examples.stg.bonus_system_ranks_dag.ranks_loader import RankLoader
-from examples.stg.bonus_system_ranks_dag.ranks_loader import UserLoader
+from examples.stg.bonus_system_ranks_dag.users_loader import UserLoader
+from examples.stg.bonus_system_ranks_dag.events_loader import EventLoader
+
 from lib import ConnectionBuilder
 
 log = logging.getLogger(__name__)
@@ -37,13 +39,21 @@ def sprint5_example_stg_bonus_system_ranks_dag():
         rest_loader = UserLoader(origin_pg_connect, dwh_pg_connect, log)
         rest_loader.load_users()  # Вызываем функцию, которая перельет данные.
 
+    # Объявляем таск, который загружает данные.
+    @task(task_id="events_load")
+    def load_events():
+        # создаем экземпляр класса, в котором реализована логика.
+        rest_loader = EventLoader(origin_pg_connect, dwh_pg_connect, log)
+        rest_loader.load_events()  # Вызываем функцию, которая перельет данные.
+
     # Инициализируем объявленные таски.
     ranks_dict = load_ranks()
     users_dict = load_users()
+    events_dict = load_events()
 
     # Далее задаем последовательность выполнения тасков.
     # Т.к. таск один, просто обозначим его здесь.
-    ranks_dict >> users_dict # type: ignore
+    ranks_dict >> users_dict >> events_dict # type: ignore
 
 
 stg_bonus_system_ranks_dag = sprint5_example_stg_bonus_system_ranks_dag()
