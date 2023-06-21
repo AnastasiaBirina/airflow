@@ -80,7 +80,7 @@ def sprint5_example_stg_order_system_restaurants():
         pg_saver = PgSaverOrder()
 
         # Инициализируем подключение у MongoDB.
-        mongo_connect = MongoConnect(cert_path, db_order, db_pw, host, rs, db, db)
+        mongo_connect = MongoConnect(cert_path, db_user, db_pw, host, rs, db, db)
 
         # Инициализируем класс, реализующий чтение данных из источника.
         collection_reader = OrderReader(mongo_connect)
