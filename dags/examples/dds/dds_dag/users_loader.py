@@ -115,7 +115,7 @@ class UserLoader:
             users_load = self.parser_js(loaded_queue)
 
             for user in users_load:
-                check_user = self.dds.get_user(user.user_id)
+                check_user = self.dds.get_user(conn, user.user_id)
                 if not check_user:
                     self.dds.insert_user(conn,user)
                 

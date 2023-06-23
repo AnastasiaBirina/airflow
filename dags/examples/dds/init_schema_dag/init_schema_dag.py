@@ -21,7 +21,7 @@ def sprint5_example_dds_init_schema_dag():
     dwh_pg_connect = ConnectionBuilder.pg_conn("PG_WAREHOUSE_CONNECTION")
 
     # Забираем путь до каталога с SQL-файлами из переменных Airflow.
-    ddl_path = Variable.get("EXAMPLE_STG_DDL_FILES_PATH")
+    ddl_path = "\s5-lessons\dags\examples\dds\init_schema_dag\ddl"
 
     # Объявляем таск, который создает структуру таблиц.
     @task(task_id="schema_init")

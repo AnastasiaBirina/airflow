@@ -68,7 +68,12 @@ CREATE TABLE IF NOT EXISTS stg.ordersystem_orders (
 --------------------------------------------------
 
 --dds 1
-
+CREATE TABLE IF NOT EXISTS dds.dm_users (
+	id serial NOT null primary key,
+	user_id varchar NOT NULL,
+	user_name  varchar NOT NULL,
+	user_login varchar NOT NULL
+);
 CREATE TABLE dds.srv_wf_settings (
 	id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
 	workflow_key varchar NOT NULL,
