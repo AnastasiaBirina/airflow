@@ -75,7 +75,7 @@ class UserDestRepository:
 
 
 class UserLoader:
-    WF_KEY = "example_users_origin_to_stg_workflow"
+    WF_KEY = "users_from_stg_to_dds_workflow"
     LAST_LOADED_ID_KEY = "last_loaded_id"
     
     def __init__(self, pg_conn: PgConnect, settings_repository: DDSEtlSettingsRepository) -> None:
@@ -103,8 +103,6 @@ class UserLoader:
         # Если возникнет ошибка, произойдет откат изменений (rollback транзакции).
         with self.conn.connection() as conn:
 
-            # Прочитываем состояние загрузки
-            # Если настройки еще нет, заводим ее.
             wf_setting = self.settings_repository.get_setting(conn, self.WF_KEY)
             if not wf_setting:
                 wf_setting = EtlSetting(id=0, workflow_key=self.WF_KEY, workflow_settings={self.LAST_LOADED_ID_KEY: -1})

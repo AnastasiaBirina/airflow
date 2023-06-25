@@ -4,6 +4,8 @@ import pendulum
 from examples.dds import DDSEtlSettingsRepository
 from airflow.decorators import dag, task
 from examples.dds.dds_dag.users_loader import UserLoader
+from examples.dds.dds_dag.rest_loader import RestLoader
+from examples.dds.dds_dag.ts_loader import TSLoader
 
 from lib import ConnectionBuilder
 
@@ -21,19 +23,35 @@ def dds_load_dag():
     # Создаем подключение к базе dwh.
     dwh_pg_connect = ConnectionBuilder.pg_conn("PG_WAREHOUSE_CONNECTION")
 
-    # Объявляем таск, который загружает данные.
+    # Объявляем таск, который загружает данные о пользователях
     @task(task_id="load_users")
     def load_users():
         # создаем экземпляр класса, в котором реализована логика.
-        rest_loader = UserLoader(dwh_pg_connect, DDSEtlSettingsRepository())
-        rest_loader.load_users()  # Вызываем функцию, которая перельет данные.
+        user_loader = UserLoader(dwh_pg_connect, DDSEtlSettingsRepository())
+        user_loader.load_users()  # Вызываем функцию, которая перельет данные.
+
+    # Объявляем таск, который загружает данные о ресторанах
+    @task(task_id="load_rest")
+    def load_rest():
+        # создаем экземпляр класса, в котором реализована логика.
+        rest_loader = RestLoader(dwh_pg_connect, DDSEtlSettingsRepository())
+        rest_loader.load_rest()  # Вызываем функцию, которая перельет данные.
+
+    # Объявляем таск, который загружает данные timestamp
+    @task(task_id="load_ts")
+    def load_ts():
+        # создаем экземпляр класса, в котором реализована логика.
+        ts_loader = TSLoader(dwh_pg_connect, DDSEtlSettingsRepository(), log)
+        ts_loader.load_ts()  # Вызываем функцию, которая перельет данные.
+
 
     # Инициализируем объявленные таски.
     users_load = load_users()
-
+    rest_load = load_rest()
+    ts_load = load_ts()
     # Далее задаем последовательность выполнения тасков.
     # Т.к. таск один, просто обозначим его здесь.
-    users_load
+    users_load >> rest_load >> ts_load
 
 
 dds_dag = dds_load_dag()
