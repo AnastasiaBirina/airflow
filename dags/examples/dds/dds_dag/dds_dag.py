@@ -9,8 +9,6 @@ from examples.dds.dds_dag.rest_loader import RestLoader
 from examples.dds.dds_dag.ts_loader import TimestampLoader
 from examples.dds.dds_dag.products_loader import ProductLoader
 from examples.dds.dds_dag.orders_loader import OrderLoader
-from examples.dds.dds_dag.cdm_load import CDMLoader
-from airflow.utils.task_group import TaskGroup
 from lib import ConnectionBuilder
 
 log = logging.getLogger(__name__)
@@ -67,12 +65,6 @@ def dds_load_dag():
         fcts_loader = FctProductsLoader(dwh_pg_connect, DDSEtlSettingsRepository())
         fcts_loader.load_product_facts()  # Вызываем функцию, которая перельет данные.
 
-    @task(task_id="load_cdm")
-    def load_cdm():
-        # создаем экземпляр класса, в котором реализована логика.
-        cdm_loader = CDMLoader(dwh_pg_connect)
-        cdm_loader.load_cdm()  # Вызываем функцию, которая перельет данные.
-
 
 
     # Инициализируем объявленные таски.
@@ -82,14 +74,13 @@ def dds_load_dag():
     products_load = load_products()
     orders_load = load_orders()
     fcts_load = load_fcts()
-    cdm_load = load_cdm()
 
 
     
 
     # Далее задаем последовательность выполнения тасков.
     # Т.к. таск один, просто обозначим его здесь.
-    [users_load, rest_load, ts_load] >> products_load >> orders_load >> fcts_load >> cdm_load
+    [users_load, rest_load, ts_load] >> products_load >> orders_load >> fcts_load 
 
 
 dds_dag = dds_load_dag()
