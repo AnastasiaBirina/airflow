@@ -168,6 +168,27 @@ CREATE TABLE dds.dm_timestamps (
 	time  time NOT null,
 	date date NOT null
 );
+
+
+--create table dds.dm_timestamps
+--(
+--    id    serial primary key,
+--    ts    timestamp not null,
+--    year  integer   not null
+--        constraint dm_timestamps_year_check
+--            check ((year >= 2022) AND (year < 2500)),
+--    month integer   not null
+--        constraint dm_timestamps_month_check
+--            check ((month >= 1) AND (month <= 12)),
+--    day   integer   not null
+--        constraint dm_timestamps_day_check
+--            check ((day >= 1) AND (day <= 31)),
+--    time  time      not null,
+--    date  date      not null
+--);
+
+
+
 CREATE TABLE dds.dm_orders (
 	id serial NOT null primary key,
 	restaurant_id integer NOT NULL,
@@ -238,3 +259,13 @@ REFERENCES dds.dm_orders(id);
 --ALTER TABLE stg.ordersystem_orders ADD CONSTRAINT ordersystem_orders_object_id_uindex UNIQUE (object_id);
 --ALTER TABLE stg.ordersystem_restaurants ADD CONSTRAINT ordersystem_restaurants_object_id_uindex UNIQUE (object_id);
 
+
+
+INSERT INTO dds.dm_orders(order_key, restaurant_id, timestamp_id, user_id, order_status)
+                    VALUES (%(order_key)s, 19, %(timestamp_id)s, %(user_id)s, %(order_status)s)
+                    ON CONFLICT (order_key) DO UPDATE
+                    SET
+                        restaurant_id = EXCLUDED.restaurant_id,
+                        timestamp_id = EXCLUDED.timestamp_id,
+                        user_id = EXCLUDED.user_id,
+                        order_status = EXCLUDED.order_status

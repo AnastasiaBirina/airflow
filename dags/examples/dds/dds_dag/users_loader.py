@@ -72,7 +72,9 @@ class UserDestRepository:
                     "user_id": user_id
                 }
             )
-
+            obj = cur.fetchone()
+            
+        return obj 
 
 class UserLoader:
     WF_KEY = "users_from_stg_to_dds_workflow"

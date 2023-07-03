@@ -60,8 +60,8 @@ CREATE TABLE cdm.dm_settlement_report (
 	CONSTRAINT dm_settlement_report_orders_count_check CHECK ((orders_count >= 0)),
 	CONSTRAINT dm_settlement_report_orders_total_sumcheck CHECK ((orders_total_sum >= (0)::numeric)),
 	CONSTRAINT dm_settlement_report_restaurant_reward_sum_check CHECK ((restaurant_reward_sum >= (0)::numeric)),
-	CONSTRAINT pk_dm_settlement_report PRIMARY KEY (id),
-	CONSTRAINT unique_restaurant_id UNIQUE (restaurant_id, settlement_date)
+	CONSTRAINT pk_dm_settlement_report UNIQUE(id),
+	CONSTRAINT unique_restaurant_id PRIMARY KEY (restaurant_id, settlement_date)
 );
 
 

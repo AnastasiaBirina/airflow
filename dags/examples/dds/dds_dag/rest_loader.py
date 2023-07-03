@@ -67,11 +67,12 @@ class RestDestRepository:
                     "active_to": rest.active_to 
                 },
             )
+    
     def get_rest(self, conn: Connection, restaurant_id: str) -> Optional[RestDdsObj]:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                    SELECT restaurant_id, restaurant_name, active_from, active_to
+                    SELECT id, restaurant_id, restaurant_name, active_from, active_to
                     FROM dds.dm_restaurants
                     WHERE restaurant_id = (%(restaurant_id)s)
                 """,
@@ -79,7 +80,9 @@ class RestDestRepository:
                     "restaurant_id": restaurant_id
                 }
             )
-
+            obj = cur.fetchone()
+            
+        return obj 
 
 class RestLoader:
     WF_KEY = "rest_from_stg_to_dds_workflow"
